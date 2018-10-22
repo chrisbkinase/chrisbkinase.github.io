@@ -1,4 +1,38 @@
-let key = prompt("Please enter your API key", "");
+const get_cookie = (name) => {
+            let name_eq = name + "=";
+            let ca = document.cookie.split(';');
+            let filtered = ca.filter((x) => {
+               return (x.trim().indexOf(name_eq) === 0);
+            });
+            return (filtered.length === 0) ? null : filtered[0].split("=")[1].split(";")[0];
+};
+
+let key;
+
+if (get_cookie('api_key')) {
+  key = get_cookie('api_key');	
+} else {
+  key = prompt("Please enter your API key", "");
+}
+
+if (key === "") {
+  
+  alert("No API given, exiting...");
+	
+  return;
+	
+}  else {
+    const set_cookie = (val) => {
+      if (get_cookie("api_key") === val) return false;
+      var d = new Date();
+      d.setTime(d.getTime() + (30*24*60*60*1000)); //30 days
+      var expires = "expires="+ d.toUTCString();
+      document.cookie = "api_key=" + val + ";" + expires + ";path=/";
+      return true;
+  };
+  set_cookie(key);
+        	
+}
 
 let base = "https://api.seetickets.com/1/";
 
