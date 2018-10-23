@@ -107,7 +107,7 @@ raw = raw.replace(/""/g, '"');
 
     })(data);
 
-   
+   $( "#meta-data" ).text(meta_data);   
 
     let payload = data[dir[0]][dir[1]];
   //  let payload = data.Shows.Show;
@@ -128,7 +128,7 @@ raw = raw.replace(/""/g, '"');
       return a.join(",");
     });
 
-     $( "#meta-data" ).text(meta_data);
+ 
 
     csv = headers.join(",") + "\n" + str_arr.join("\n");
 
