@@ -1,3 +1,5 @@
+function master() {
+
 const get_cookie = (name) => {
             let name_eq = name + "=";
             let ca = document.cookie.split(';');
@@ -7,10 +9,21 @@ const get_cookie = (name) => {
             return (filtered.length === 0) ? null : filtered[0].split("=")[1].split(";")[0];
 };
 
+const set_cookie = (val) => {
+      const c_name = "api_key";
+      var d = new Date();
+      d.setTime(d.getTime() + (30*24*60*60*1000)); //30 days
+      var expires = "expires="+ d.toUTCString();
+      document.cookie = c_name  + "=" + val + ";" + expires + ";path=/";
+      return true;
+};
+
 let key;
 
-if (get_cookie('api_key')) {
-  key = get_cookie('api_key');	
+let cookie = get_cookie("api_key");
+
+if (cookie) {
+  key = cookie;	
 } else {
   key = prompt("Please enter your API key", "");
 }
@@ -21,16 +34,11 @@ if (key === "") {
 	
   return;
 	
-}  else {
-    const set_cookie = (val) => {
-      if (get_cookie("api_key") === val) return false;
-      var d = new Date();
-      d.setTime(d.getTime() + (30*24*60*60*1000)); //30 days
-      var expires = "expires="+ d.toUTCString();
-      document.cookie = "api_key=" + val + ";" + expires + ";path=/";
-      return true;
-  };
+} else {
+
   set_cookie(key);
+  console.log("cookie placed for key: " + key);
+  console.log(document.cookie);
         	
 }
 
@@ -445,4 +453,6 @@ Object.flatten = function(data) {
     return result;
 }
 
+}
 
+master();
