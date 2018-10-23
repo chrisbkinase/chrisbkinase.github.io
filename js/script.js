@@ -79,10 +79,40 @@ raw = raw.replace(/""/g, '"');
 
     };
 
-    
+    let max_html_rows = 100;
     
     let data = JSON.parse(raw);
-    let payload = data.Shows.Show;
+
+    let dir = ((path) => {
+      let a = [];
+      let regex = /[?/]/;
+      let split_char = path.match(regex)[0];
+      let p1 = path.split(split_char)[0];
+      let proper = p1.split("")[0].toUpperCase() + p1.split("").slice(1).join("");
+      a[0] = proper;
+      a[1] = proper.split("").slice(0, proper.length - 1).join("");
+      return a;
+    })(req);
+
+    let meta_data = ((d) => {
+      let arr = [];
+        for (let key in d){
+         if (key === dir[0]) {
+	   continue;	
+	}
+         arr.push(key + ": " + d[key]);
+       }
+
+     return arr.join(" / ");
+
+    })(data);
+
+   
+
+    let payload = data[dir[0]][dir[1]];
+  //  let payload = data.Shows.Show;
+
+    /*
    
     let arr = payload.map(flatten);
 
@@ -98,6 +128,8 @@ raw = raw.replace(/""/g, '"');
       return a.join(",");
     });
 
+     $( "#meta-data" ).text(meta_data);
+
     csv = headers.join(",") + "\n" + str_arr.join("\n");
 
     arr = [headers, ...arr];
@@ -105,7 +137,27 @@ raw = raw.replace(/""/g, '"');
 
    // let arr = $.csv.toArrays(csv);
     //let p = JSON.stringify(data, null, 2);
-    generateHtmlTable(arr);
+
+    arr = arr.slice(0, max_html_rows);
+
+
+    */
+    
+    var inArray = arrayFrom(payload);
+
+    var outArray = [];
+    for (var row in inArray)
+        outArray[outArray.length] = parse_object(inArray[row]);
+
+    let arr = outArray;
+
+    let csv = $.csv.fromObjects(outArray);
+
+    let headers = csv.split("\n")[0].split(",");
+
+   // arr = [headers, ...arr];
+    renderCSV(arr);
+    //generateHtmlTable(arr);
 	//$('#str').text( csv );
 
     $( "#dl_btn" ).click(function() {
@@ -375,6 +427,44 @@ function generateHtmlTable(data) {
     $('#csv-display').append(html);
   }
 }
+
+ function renderCSV(objects) {
+    var rows = $.csv.fromObjects(objects, {justArrays: true});
+    if (rows.length < 1) return;
+
+    // find CSV table
+    var table = $('#csv-display')[0];
+    $(table).text("");
+
+    // render header row
+    var thead = document.createElement("thead");
+    var tr = document.createElement("tr");
+    var header = rows[0];
+    for (field in header) {
+      var th = document.createElement("th");
+      $(th).text(header[field])
+      tr.appendChild(th);
+    }
+    thead.appendChild(tr);
+
+    // render body of table
+    var tbody = document.createElement("tbody");
+    for (var i=1; i<rows.length; i++) {
+      tr = document.createElement("tr");
+      for (field in rows[i]) {
+        var td = document.createElement("td");
+        $(td)
+          .text(rows[i][field])
+          .attr("title", rows[i][field]);
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+  }
+
 
 const json2flat_csv = (data) => {
 
