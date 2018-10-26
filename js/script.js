@@ -94,7 +94,7 @@ raw = raw.replace(/""/g, '"');
       return a;
     })(req);
 
-    let meta_data = ((d) => {
+    let meta_data_str = ((d) => {
       let arr = [];
         for (let key in d){
          if (key === dir[0]) {
@@ -106,43 +106,26 @@ raw = raw.replace(/""/g, '"');
      return arr.join(" / ");
 
     })(data);
+ 
+let meta_data_obj = ((d) => {
+      let obj = {};
+        for (let key in d){
+         if (key === dir[0]) {
+	   continue;	
+	}
+         obj[key] = d[key];
+       }
 
-   $( "#meta-data" ).text(meta_data);   
+	return obj;
+
+    })(data);
+	  
+
+   $( "#meta-data" ).text(meta_data_str);   
 
     let payload = data[dir[0]][dir[1]];
-  //  let payload = data.Shows.Show;
-
-    /*
-   
-    let arr = payload.map(flatten);
-
-    let headers = Object.keys(arr[0]);
-
-
-    let str_arr = arr.map(x => {
-      let a = [];
-
-      for (let key in x){
-	a.push(x[key]);
-      }
-      return a.join(",");
-    });
-
- 
-
-    csv = headers.join(",") + "\n" + str_arr.join("\n");
-
-    arr = [headers, ...arr];
-
-
-   // let arr = $.csv.toArrays(csv);
-    //let p = JSON.stringify(data, null, 2);
-
-    arr = arr.slice(0, max_html_rows);
-
-
-    */
     
+//display csv
     var inArray = arrayFrom(payload);
 
     var outArray = [];
@@ -159,7 +142,58 @@ raw = raw.replace(/""/g, '"');
     renderCSV(arr);
     //generateHtmlTable(arr);
 	//$('#str').text( csv );
+	  
+    //all results csv;
+	  /*
+	if (meta_data_obj.ItemsPerPage == 500){
+		
+	const update_url = (url, param, to) => {
+  		let pre_qm = url.split("?")[0];
+  	let post_qm = url.split("?")[1];
+  	let split = post_qm.split("&");
+  	let key_vals = split.map(x => x.split("="));
+  	for (let i = 0; i < key_vals.length; i++) {
+    	if (key_vals[i][0] === param) {
+      	key_vals[i][1] = to;
+    	}
+  	}
+  	let j = key_vals.map(x => x.join("=")).join("&");
+  	return [pre_qm, j].join("?");
+        }
+		
+	  let curr_page = meta_data.CurrentPage;
 
+          let total_calls = meta_data.TotalPages;
+
+           for (let i = curr_page + 1; i < total_calls; i++) {
+           url = update_url(url, "page", i);
+           arr.push(url);
+        }
+        let data_arr = [];
+           arr = arr.forEach((url) => {
+            var request = new XMLHttpRequest();
+            request.open('GET', url, true);
+
+                request.onload = function() {
+			
+		   var raw = request.responseText;
+
+
+                   raw = raw.replace(/\"/g, "\"");
+                   raw = raw.replace(/""/g, '"');
+			
+		   let data = JSON.parse(raw);
+			
+		   data_arr.push(data);
+		};
+            request.send();
+           
+         });
+		  
+          let master_arr = data_arr.flat();  
+	  
+	 }
+    */
     $( "#dl_btn" ).click(function() {
         dl_event(csv, "test_report");
     });
